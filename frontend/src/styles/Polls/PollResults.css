@@ -1,0 +1,43 @@
+.poll-results-container {
+    padding: 2rem;
+}
+
+.poll-results-container h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.poll-results-container p {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #bbbbbb;
+}
+
+.results-list {
+    list-style: none;
+    padding: 0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.results-list li {
+    background-color: #1e1e1e;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.results-list li span {
+    flex: 1;
+}
+
+.results-list li span:first-child {
+    flex: 2;
+}
+
+.results-list li span:last-child {
+    text-align: right;
+}
