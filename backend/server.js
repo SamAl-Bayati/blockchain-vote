@@ -20,7 +20,7 @@ const FRONTEND_URL = process.env.NODE_ENV === 'development'
 
 const BACKEND_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000'
-  : 'https://api-evote.onrender.com/'; // Replace with your backend URL
+  : 'https://api-evote.onrender.com'; // Replace with your backend URL
 
 // Force development mode if needed
 if (process.env.NODE_ENV !== 'production') {
