@@ -273,8 +273,8 @@ app.get(
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     console.log('Authenticated user:', req.user);
-    console.log('Redirecting to:', `${FRONTEND_URL}/polls`);
-    res.redirect(`${FRONTEND_URL}/polls`);
+    console.log('Redirecting to:', `${FRONTEND_URL}`);
+    res.redirect(`${FRONTEND_URL}`);
   }
 );
 
