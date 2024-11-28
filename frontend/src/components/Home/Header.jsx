@@ -19,15 +19,23 @@ const Header = ({ user, onLogout }) => {
 
   return (
     <header className="containerHeader">
-      <h1>Decentralized Polls</h1>
+      <h1>eVote</h1>
       <nav>
         <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/polls">Polls</Link></li>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/polls">Polls</Link>
+          </li>
           {user ? (
             <>
-              <li><Link to="/polls/create">Create Poll</Link></li>
-              <li><Link to="/account">Account</Link></li>
+              <li>
+                <Link to="/polls/create">Create Poll</Link>
+              </li>
+              <li>
+                <Link to="/account">Account</Link>
+              </li>
               <li className="user-menu" ref={dropdownRef}>
                 <button
                   className="user-menu-button"
@@ -35,20 +43,29 @@ const Header = ({ user, onLogout }) => {
                 >
                   {user.firstName && user.lastName
                     ? `${user.firstName} ${user.lastName}`
-                    : user.displayName || 'Welcome User'} ▼
+                    : user.displayName || 'Welcome User'}{' '}
+                  ▼
                 </button>
                 {isDropdownOpen && (
                   <div className="user-dropdown">
-                    <button onClick={() => {
-                      onLogout();
-                      setIsDropdownOpen(false);
-                    }}>Logout</button>
+                    <button
+                      onClick={() => {
+                        onLogout();
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      Logout
+                    </button>
                   </div>
                 )}
               </li>
             </>
           ) : (
-            <li><Link to="/signin" className="sign-in-link">Sign In</Link></li>
+            <li>
+              <Link to="/signin" className="sign-in-link">
+                Sign In
+              </Link>
+            </li>
           )}
         </ul>
       </nav>

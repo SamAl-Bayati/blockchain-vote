@@ -9,6 +9,7 @@ import PrivateRoute from './components/Auth/PrivateRoute';
 import PollsList from './components/Polls/PollsList';
 import CreatePoll from './components/Polls/CreatePoll';
 import AnswerPoll from './components/Polls/AnswerPoll';
+import PollResults from './components/Polls/PollResults';
 import AccountSettings from './components/User/AccountSettings';
 
 // Configure Axios
@@ -113,6 +114,14 @@ function App() {
             }
           />
           <Route
+            path="/polls/:pollId/results"
+            element={
+              <PrivateRoute user={user}>
+                <PollResults user={user} />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/account"
             element={
               <PrivateRoute user={user}>
@@ -120,7 +129,8 @@ function App() {
               </PrivateRoute>
             }
           />
-          {/* Add other routes as needed */}
+          {/* Catch-all route to handle undefined paths */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       )}
     </Router>

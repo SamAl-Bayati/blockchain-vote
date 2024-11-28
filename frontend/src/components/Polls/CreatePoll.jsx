@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Header from '../Home/Header';
 import '../../styles/Polls/CreatePoll.css';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePoll = ({ user }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [options, setOptions] = useState(['', '']);
+  const navigate = useNavigate();
 
   const handleOptionChange = (index, value) => {
     const newOptions = [...options];
@@ -31,7 +33,7 @@ const CreatePoll = ({ user }) => {
         options,
       });
       // Redirect to polls list
-      window.location.href = '/polls';
+      navigate('/polls');
     } catch (error) {
       console.error('Error creating poll:', error);
     }
@@ -61,11 +63,15 @@ const CreatePoll = ({ user }) => {
                   required
                 />
                 {options.length > 2 && (
-                  <button type="button" onClick={() => removeOption(index)}>Remove</button>
+                  <button type="button" onClick={() => removeOption(index)}>
+                    Remove
+                  </button>
                 )}
               </div>
             ))}
-            <button type="button" onClick={addOption}>Add Option</button>
+            <button type="button" onClick={addOption}>
+              Add Option
+            </button>
           </div>
           <button type="submit">Create Poll</button>
         </form>

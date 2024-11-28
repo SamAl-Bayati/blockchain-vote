@@ -12,9 +12,10 @@ const AnswerPoll = ({ user }) => {
   const [hasVoted, setHasVoted] = useState(false);
 
   useEffect(() => {
-    axios.get(`/polls/${pollId}`)
-      .then(response => setPoll(response.data))
-      .catch(error => console.error(error));
+    axios
+      .get(`/polls/${pollId}`)
+      .then((response) => setPoll(response.data))
+      .catch((error) => console.error(error));
   }, [pollId]);
 
   const handleVote = () => {
@@ -22,13 +23,17 @@ const AnswerPoll = ({ user }) => {
       alert('Please select an option.');
       return;
     }
-    axios.post(`/polls/${pollId}/vote`, { optionId: selectedOption })
-      .then(response => {
+    axios
+      .post(`/polls/${pollId}/vote`, { optionId: selectedOption })
+      .then((response) => {
         alert('Your vote has been recorded.');
         setHasVoted(true);
       })
-      .catch(error => {
-        if (error.response && error.response.data.message === 'You have already voted on this poll.') {
+      .catch((error) => {
+        if (
+          error.response &&
+          error.response.data.message === 'You have already voted on this poll.'
+        ) {
           alert('You have already voted on this poll.');
           setHasVoted(true);
         } else {
@@ -52,7 +57,7 @@ const AnswerPoll = ({ user }) => {
         <h2>{poll.poll.title}</h2>
         <p>{poll.poll.description}</p>
         <div className="options-list">
-          {poll.options.map(option => (
+          {poll.options.map((option) => (
             <div key={option.id} className="option-item">
               <label>
                 <input

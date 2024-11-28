@@ -8,7 +8,7 @@ const HomeApp = ({ user, onLogout }) => {
     <div>
       <Header user={user} onLogout={onLogout} />
       <main>
-        <h2>Welcome to the Decentralized Polling App</h2>
+        <h2>Welcome to eVote</h2>
         <p>Create and participate in polls securely using blockchain technology.</p>
       </main>
       <Footer />
