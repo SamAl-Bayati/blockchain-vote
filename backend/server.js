@@ -16,11 +16,11 @@ const bcrypt = require('bcrypt');
 // First declare the environment variables 
 const FRONTEND_URL = process.env.NODE_ENV === 'development' 
   ? 'http://localhost:3000'
-  : 'https://yourfrontendurl.com'; // Replace with your frontend URL
+  : 'https://evote-89pd.onrender.com'; // Replace with your frontend URL
 
 const BACKEND_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000'
-  : 'https://yourbackendurl.com'; // Replace with your backend URL
+  : 'https://api-evote.onrender.com/'; // Replace with your backend URL
 
 // Force development mode if needed
 if (process.env.NODE_ENV !== 'production') {
