@@ -13,7 +13,7 @@ import AccountSettings from './components/User/AccountSettings';
 
 // Configure Axios
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:5000'; // Update with your backend URL
+axios.defaults.baseURL = 'https://api-evote.onrender.com'; // Update with your backend URL
 
 function App() {
   const [user, setUser] = useState(null);
@@ -48,7 +48,7 @@ function App() {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/google'; // Update with your backend URL
+    window.location.href = 'https://api-evote.onrender.com/auth/google'; // Update with your backend URL
   };
 
   const handleLogout = async () => {

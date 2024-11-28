@@ -30,7 +30,7 @@ const SignIn = ({ onLogin, setUser }) => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/google'; // Update with your backend URL
+    window.location.href = 'https://api-evote.onrender.com/auth/google'; // Update with your backend URL
   };
 
   return (
