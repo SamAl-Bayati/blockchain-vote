@@ -268,7 +268,7 @@ app.post(
 
 app.get('/contract-info', (req, res) => {
   const contractAddress = process.env.CONTRACT_ADDRESS;
-  const abiPath = path.join(__dirname, 'artifacts/contracts/Poll.sol/PollContract.json');
+  const abiPath = path.join(__dirname, 'artifacts/contracts/poll.sol/PollContract.json');
 
   console.log('ABI Path:', abiPath); // Add logging to verify the path
 
