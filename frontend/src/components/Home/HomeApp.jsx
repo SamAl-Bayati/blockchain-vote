@@ -5,9 +5,9 @@ import '../../styles/Home/global.css';
 
 const HomeApp = ({ user, onLogout }) => {
   return (
-    <div>
+    <div className="home-container">
       <Header user={user} onLogout={onLogout} />
-      <main>
+      <main className="home-main">
         <h2>Welcome to eVote</h2>
         <p>Create and participate in polls securely using blockchain technology.</p>
       </main>

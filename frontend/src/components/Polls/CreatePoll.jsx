@@ -146,24 +146,15 @@ const CreatePoll = ({ user }) => {
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
           <div className="form-group">
-            <label>Options:</label>
-            {options.map((option, index) => (
-              <div key={index} className="option-input">
-                <input
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                  required
-                />
-                {options.length > 2 && (
-                  <button type="button" onClick={() => removeOption(index)}>
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button type="button" onClick={addOption}>
-              Add Option
-            </button>
+            <label>Poll Type:</label>
+            <select
+              value={pollType}
+              onChange={(e) => setPollType(e.target.value)}
+              required
+            >
+              <option value="normal">Normal Poll</option>
+              <option value="blockchain">Blockchain Poll</option>
+            </select>
           </div>
           <button type="submit">Create Poll</button>
         </form>

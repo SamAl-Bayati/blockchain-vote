@@ -188,13 +188,18 @@ const AnswerPoll = ({ user }) => {
         <div className="options-list">
           {pollOptions.map((option) => (
             <div key={option.id} className="option-item">
-              <label>
+              <label
+                className={`option-label ${selectedOption === option.id ? 'selected' : ''} ${
+                  hasVoted ? 'disabled' : ''
+                }`}
+                onClick={() => !hasVoted && setSelectedOption(option.id)}
+              >
                 <input
                   type="radio"
                   name="poll-option"
                   value={option.id}
-                  onChange={() => setSelectedOption(option.id)}
-                  disabled={hasVoted}
+                  checked={selectedOption === option.id}
+                  readOnly
                 />
                 {option.text}
               </label>
