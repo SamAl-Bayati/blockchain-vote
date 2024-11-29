@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
 import '../../styles/Polls/AnswerPoll.css';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ethers } from 'ethers'; // Import ethers
+import { ethers } from 'ethers';
 import axios from 'axios';
 
 const AnswerPoll = ({ user }) => {
@@ -31,15 +31,18 @@ const AnswerPoll = ({ user }) => {
       if (!window.ethereum || !contractInfo) return;
 
       try {
+        // Request account access first
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const { chainId } = await provider.getNetwork();
+        console.log('Chain ID:', chainId);
+        console.log('Type of Chain ID:', typeof chainId);
 
         if (chainId !== 11155111) {
           alert('Please switch your MetaMask network to Sepolia Test Network.');
           return;
         }
-
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const signer = provider.getSigner();
 
@@ -87,8 +90,13 @@ const AnswerPoll = ({ user }) => {
     }
 
     try {
+      // Request account access first
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const { chainId } = await provider.getNetwork();
+      console.log('Chain ID:', chainId);
+      console.log('Type of Chain ID:', typeof chainId);
 
       if (chainId !== 11155111) {
         alert('Please switch your MetaMask network to Sepolia Test Network.');

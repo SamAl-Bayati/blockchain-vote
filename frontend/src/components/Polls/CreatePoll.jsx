@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
 import '../../styles/Polls/CreatePoll.css';
 import { useNavigate } from 'react-router-dom';
-import { ethers } from 'ethers'; // Import ethers
+import { ethers } from 'ethers';
 import axios from 'axios';
 
 const CreatePoll = ({ user }) => {
@@ -42,42 +42,42 @@ const CreatePoll = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!window.ethereum) {
       alert('Please install MetaMask to interact with the blockchain.');
       return;
     }
-  
+
     if (!contractInfo) {
       alert('Contract information not loaded yet.');
       return;
     }
-  
+
     try {
-      // Request account access
+      // Request account access first
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-  
+
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const { chainId } = await provider.getNetwork();
       console.log('Chain ID:', chainId);
       console.log('Type of Chain ID:', typeof chainId);
-  
+
       if (chainId !== 11155111) { // Sepolia's chain ID
         alert('Please switch your MetaMask network to Sepolia Test Network.');
         return;
       }
-  
+
       const signer = provider.getSigner();
-  
+
       const pollContract = new ethers.Contract(
         contractInfo.contractAddress,
         contractInfo.abi,
         signer
       );
-  
+
       const tx = await pollContract.createPoll(title, description, options);
       await tx.wait();
-  
+
       alert('Poll created successfully on the blockchain!');
       navigate('/polls');
     } catch (error) {
@@ -85,7 +85,6 @@ const CreatePoll = ({ user }) => {
       alert('Error creating poll. See console for details.');
     }
   };
-  
 
   return (
     <div>

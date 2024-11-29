@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
 import '../../styles/Polls/PollResults.css';
 import { useParams } from 'react-router-dom';
-import { ethers } from 'ethers'; // Import ethers
+import { ethers } from 'ethers';
 import axios from 'axios';
 
 const PollResults = ({ user }) => {
@@ -28,15 +28,18 @@ const PollResults = ({ user }) => {
       if (!window.ethereum || !contractInfo) return;
 
       try {
+        // Request account access first
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const { chainId } = await provider.getNetwork();
+        console.log('Chain ID:', chainId);
+        console.log('Type of Chain ID:', typeof chainId);
 
         if (chainId !== 11155111) {
           alert('Please switch your MetaMask network to Sepolia Test Network.');
           return;
         }
-
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const signer = provider.getSigner();
 
@@ -85,7 +88,7 @@ const PollResults = ({ user }) => {
         <h2>Results for: {poll.title}</h2>
         <p>{poll.description}</p>
         <ul className="results-list">
-          {poll.options.map(option => (
+          {poll.options.map((option) => (
             <li key={option.id}>
               <span>{option.text}</span>
               <span>{option.voteCount} votes</span>
