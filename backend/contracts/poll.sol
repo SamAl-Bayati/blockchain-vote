@@ -16,11 +16,11 @@ contract PollContract {
         string description;
         mapping(uint256 => Option) options;
         uint256 optionsCount;
-        mapping(address => bool) voters;
         bool exists;
     }
 
     mapping(uint256 => Poll) public polls;
+    mapping(uint256 => mapping(address => bool)) public voters; // Moved outside Poll struct
 
     event PollCreated(
         uint256 id,
@@ -58,11 +58,11 @@ contract PollContract {
     function vote(uint256 _pollId, uint256 _optionId) public {
         Poll storage poll = polls[_pollId];
         require(poll.exists, "Poll does not exist");
-        require(!poll.voters[msg.sender], "Already voted");
+        require(!voters[_pollId][msg.sender], "Already voted");
         require(_optionId < poll.optionsCount, "Invalid option");
 
         poll.options[_optionId].voteCount++;
-        poll.voters[msg.sender] = true;
+        voters[_pollId][msg.sender] = true;
 
         emit Voted(_pollId, msg.sender, _optionId);
     }
