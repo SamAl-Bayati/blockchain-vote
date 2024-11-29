@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
 import '../../styles/Polls/CreatePoll.css';
 import { useNavigate } from 'react-router-dom';
+import { ethers } from 'ethers'; // Import ethers
+import axios from 'axios';
 
 const CreatePoll = ({ user }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [options, setOptions] = useState(['', '']);
   const navigate = useNavigate();
+
+  const [contractInfo, setContractInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchContractInfo = async () => {
+      try {
+        const response = await axios.get('/contract-info');
+        setContractInfo(response.data);
+      } catch (error) {
+        console.error('Error fetching contract info:', error);
+      }
+    };
+
+    fetchContractInfo();
+  }, []);
 
   const handleOptionChange = (index, value) => {
     const newOptions = [...options];
@@ -26,30 +42,45 @@ const CreatePoll = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!window.ethereum) {
       alert('Please install MetaMask to interact with the blockchain.');
       return;
     }
-  
+
+    if (!contractInfo) {
+      alert('Contract information not loaded yet.');
+      return;
+    }
+
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const { chainId } = await provider.getNetwork();
-  
-    if (chainId !== 11155111) { // 11155111 is the chain ID for Sepolia
+
+    if (chainId !== 11155111) { // Sepolia's chain ID
       alert('Please switch your MetaMask network to Sepolia Test Network.');
       return;
     }
-    
+
     try {
-      await axios.post('/polls', {
-        title,
-        description,
-        options,
-      });
-      // Redirect to polls list
+      // Request account access
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      const signer = provider.getSigner();
+
+      const pollContract = new ethers.Contract(
+        contractInfo.contractAddress,
+        contractInfo.abi,
+        signer
+      );
+
+      const tx = await pollContract.createPoll(title, description, options);
+      await tx.wait();
+
+      alert('Poll created successfully on the blockchain!');
       navigate('/polls');
     } catch (error) {
       console.error('Error creating poll:', error);
+      alert('Error creating poll. See console for details.');
     }
   };
 
