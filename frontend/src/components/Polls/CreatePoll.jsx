@@ -55,6 +55,8 @@ const CreatePoll = ({ user }) => {
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const { chainId } = await provider.getNetwork();
+    console.log('Chain ID:', chainId);
+    console.log('Type of Chain ID:', typeof chainId);
 
     if (chainId !== 11155111) { // Sepolia's chain ID
       alert('Please switch your MetaMask network to Sepolia Test Network.');
