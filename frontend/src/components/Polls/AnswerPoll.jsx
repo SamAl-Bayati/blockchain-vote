@@ -8,26 +8,58 @@ import axios from 'axios';
 const AnswerPoll = ({ user }) => {
   const { pollId } = useParams();
   const navigate = useNavigate();
-  const [poll, setPoll] = useState(null);
+
+  // Separate states for poll metadata and options
+  const [pollMetadata, setPollMetadata] = useState(null);
+  const [pollOptions, setPollOptions] = useState([]);
+  const [isBlockchainPoll, setIsBlockchainPoll] = useState(false);
+
   const [selectedOption, setSelectedOption] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [contractInfo, setContractInfo] = useState(null);
 
   useEffect(() => {
-    const fetchContractInfo = async () => {
+    const fetchPoll = async () => {
       try {
-        const response = await axios.get('/contract-info');
-        setContractInfo(response.data);
+        // Fetch poll data from the backend
+        const response = await axios.get(`/polls/${pollId}`);
+        const pollData = response.data.poll;
+        const optionsData = response.data.options;
+
+        setPollMetadata(pollData);
+        setPollOptions(optionsData);
+        setIsBlockchainPoll(pollData.type === 'blockchain');
+
+        // Check if the user has already voted (for normal polls)
+        if (pollData.type === 'normal') {
+          const voteCheck = await axios.get(`/polls/${pollId}/hasVoted`);
+          setHasVoted(voteCheck.data.hasVoted);
+        }
       } catch (error) {
-        console.error('Error fetching contract info:', error);
+        console.error('Error fetching poll:', error);
       }
     };
 
-    fetchContractInfo();
-  }, []);
+    fetchPoll();
+  }, [pollId]);
 
   useEffect(() => {
-    const loadPoll = async () => {
+    if (isBlockchainPoll) {
+      const fetchContractInfo = async () => {
+        try {
+          const response = await axios.get('/contract-info');
+          setContractInfo(response.data);
+        } catch (error) {
+          console.error('Error fetching contract info:', error);
+        }
+      };
+
+      fetchContractInfo();
+    }
+  }, [isBlockchainPoll]);
+
+  useEffect(() => {
+    const loadBlockchainPollData = async () => {
       if (!window.ethereum || !contractInfo) return;
 
       try {
@@ -60,68 +92,80 @@ const AnswerPoll = ({ user }) => {
           options.push({ id: i, text: option[0], voteCount: option[1].toNumber() });
         }
 
-        setPoll({
+        setPollMetadata({
           id: pollData[0].toNumber(),
           creator: pollData[1],
           title: pollData[2],
           description: pollData[3],
-          options: options,
         });
+        setPollOptions(options);
 
         // Check if user has already voted
         const hasVoted = await pollContract.voters(pollId, await signer.getAddress());
         setHasVoted(hasVoted);
       } catch (error) {
-        console.error('Error loading poll:', error);
+        console.error('Error loading blockchain poll data:', error);
       }
     };
 
-    if (contractInfo) {
-      loadPoll();
+    if (isBlockchainPoll && contractInfo) {
+      loadBlockchainPollData();
     }
-  }, [pollId, contractInfo]);
+  }, [pollId, isBlockchainPoll, contractInfo]);
 
   const handleVote = async () => {
-    if (!window.ethereum || !contractInfo) return;
-
     if (selectedOption === null) {
       alert('Please select an option.');
       return;
     }
 
-    try {
-      // Request account access first
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (isBlockchainPoll) {
+      if (!window.ethereum || !contractInfo) return;
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const { chainId } = await provider.getNetwork();
-      console.log('Chain ID:', chainId);
-      console.log('Type of Chain ID:', typeof chainId);
+      try {
+        // Request account access first
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-      if (chainId !== 11155111) {
-        alert('Please switch your MetaMask network to Sepolia Test Network.');
-        return;
-      }
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const { chainId } = await provider.getNetwork();
+        console.log('Chain ID:', chainId);
+        console.log('Type of Chain ID:', typeof chainId);
 
-      const signer = provider.getSigner();
+        if (chainId !== 11155111) {
+          alert('Please switch your MetaMask network to Sepolia Test Network.');
+          return;
+        }
 
-      const pollContract = new ethers.Contract(
-        contractInfo.contractAddress,
-        contractInfo.abi,
-        signer
-      );
+        const signer = provider.getSigner();
 
-      const tx = await pollContract.vote(pollId, selectedOption);
-      await tx.wait();
+        const pollContract = new ethers.Contract(
+          contractInfo.contractAddress,
+          contractInfo.abi,
+          signer
+        );
 
-      alert('Your vote has been recorded on the blockchain.');
-      setHasVoted(true);
-    } catch (error) {
-      console.error('Error voting:', error);
-      if (error.data && error.data.message.includes('Already voted')) {
-        alert('You have already voted on this poll.');
+        const tx = await pollContract.vote(pollId, selectedOption);
+        await tx.wait();
+
+        alert('Your vote has been recorded on the blockchain.');
         setHasVoted(true);
-      } else {
+      } catch (error) {
+        console.error('Error voting:', error);
+        if (error.data && error.data.message.includes('Already voted')) {
+          alert('You have already voted on this poll.');
+          setHasVoted(true);
+        } else {
+          alert('Error voting. See console for details.');
+        }
+      }
+    } else {
+      // Handle normal poll voting
+      try {
+        await axios.post(`/polls/${pollId}/vote`, { optionId: selectedOption });
+        alert('Your vote has been recorded.');
+        setHasVoted(true);
+      } catch (error) {
+        console.error('Error voting:', error);
         alert('Error voting. See console for details.');
       }
     }
@@ -131,7 +175,7 @@ const AnswerPoll = ({ user }) => {
     navigate(`/polls/${pollId}/results`);
   };
 
-  if (!poll) {
+  if (!pollMetadata || pollOptions.length === 0) {
     return <div>Loading...</div>;
   }
 
@@ -139,10 +183,10 @@ const AnswerPoll = ({ user }) => {
     <div>
       <Header user={user} />
       <main className="answer-poll-container">
-        <h2>{poll.title}</h2>
-        <p>{poll.description}</p>
+        <h2>{pollMetadata.title}</h2>
+        <p>{pollMetadata.description}</p>
         <div className="options-list">
-          {poll.options.map((option) => (
+          {pollOptions.map((option) => (
             <div key={option.id} className="option-item">
               <label>
                 <input

@@ -15,8 +15,8 @@ const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 
-// First declare the environment variables 
-const FRONTEND_URL = process.env.NODE_ENV === 'development' 
+// First declare the environment variables
+const FRONTEND_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:3000'
   : 'https://evote-89pd.onrender.com'; // Replace with your frontend URL
 
@@ -362,23 +362,36 @@ app.post(
     body('title').isString(),
     body('description').optional().isString(),
     body('options').isArray({ min: 2 }),
+    body('type').isIn(['normal', 'blockchain']),
+    body('id').optional().isInt(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, description, options } = req.body;
+    const { id, title, description, options, type } = req.body;
     const userId = req.user.id;
 
     try {
-      // Insert into polls table
-      const pollResult = await pool.query(
-        `INSERT INTO polls (user_id, title, description)
-         VALUES ($1, $2, $3) RETURNING *`,
-        [userId, title, description]
-      );
+      let pollResult;
+      if (id) {
+        // For blockchain polls
+        pollResult = await pool.query(
+          `INSERT INTO polls (id, user_id, title, description, type)
+           VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+          [id, userId, title, description, type]
+        );
+      } else {
+        // For normal polls
+        pollResult = await pool.query(
+          `INSERT INTO polls (user_id, title, description, type)
+           VALUES ($1, $2, $3, $4) RETURNING *`,
+          [userId, title, description, type]
+        );
+      }
 
       const pollId = pollResult.rows[0].id;
 
@@ -500,6 +513,24 @@ app.get('/polls/:pollId/results', ensureAuthenticated, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching poll results:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Check if user has already voted on a poll
+app.get('/polls/:pollId/hasVoted', ensureAuthenticated, async (req, res) => {
+  const { pollId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const voteCheck = await pool.query(
+      `SELECT * FROM votes WHERE user_id = $1 AND poll_id = $2`,
+      [userId, pollId]
+    );
+
+    res.json({ hasVoted: voteCheck.rows.length > 0 });
+  } catch (error) {
+    console.error('Error checking vote status:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

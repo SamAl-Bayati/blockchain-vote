@@ -27,6 +27,7 @@ const PollsList = ({ user, onLogout }) => {
               <p>
                 Created by: {poll.first_name} {poll.last_name}
               </p>
+              <p>Type: {poll.type === 'blockchain' ? 'Blockchain Poll' : 'Normal Poll'}</p>
               <Link to={`/polls/${poll.id}`}>View Poll</Link>
             </li>
           ))}

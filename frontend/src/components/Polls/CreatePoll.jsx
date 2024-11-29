@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import axios from 'axios';
 
 const CreatePoll = ({ user }) => {
+  const [pollType, setPollType] = useState('normal'); // New state for poll type
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [options, setOptions] = useState(['', '']);
@@ -43,46 +44,81 @@ const CreatePoll = ({ user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!window.ethereum) {
-      alert('Please install MetaMask to interact with the blockchain.');
-      return;
-    }
-
-    if (!contractInfo) {
-      alert('Contract information not loaded yet.');
-      return;
-    }
-
-    try {
-      // Request account access first
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const { chainId } = await provider.getNetwork();
-      console.log('Chain ID:', chainId);
-      console.log('Type of Chain ID:', typeof chainId);
-
-      if (chainId !== 11155111) { // Sepolia's chain ID
-        alert('Please switch your MetaMask network to Sepolia Test Network.');
+    if (pollType === 'blockchain') {
+      // Handle blockchain poll creation
+      if (!window.ethereum) {
+        alert('Please install MetaMask to interact with the blockchain.');
         return;
       }
 
-      const signer = provider.getSigner();
+      if (!contractInfo) {
+        alert('Contract information not loaded yet.');
+        return;
+      }
 
-      const pollContract = new ethers.Contract(
-        contractInfo.contractAddress,
-        contractInfo.abi,
-        signer
-      );
+      try {
+        // Request account access first
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-      const tx = await pollContract.createPoll(title, description, options);
-      await tx.wait();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const { chainId } = await provider.getNetwork();
+        console.log('Chain ID:', chainId);
+        console.log('Type of Chain ID:', typeof chainId);
 
-      alert('Poll created successfully on the blockchain!');
-      navigate('/polls');
-    } catch (error) {
-      console.error('Error creating poll:', error);
-      alert('Error creating poll. See console for details.');
+        if (chainId !== 11155111) { // Sepolia's chain ID
+          alert('Please switch your MetaMask network to Sepolia Test Network.');
+          return;
+        }
+
+        const signer = provider.getSigner();
+
+        const pollContract = new ethers.Contract(
+          contractInfo.contractAddress,
+          contractInfo.abi,
+          signer
+        );
+
+        const tx = await pollContract.createPoll(title, description, options);
+        await tx.wait();
+
+        // Get the new poll ID from the blockchain
+        const pollCount = await pollContract.pollCount();
+        const newPollId = pollCount.toNumber();
+
+        // Send poll data to the backend for synchronization
+        const pollData = {
+          id: newPollId,
+          title,
+          description,
+          options,
+          type: 'blockchain',
+        };
+
+        await axios.post('/polls', pollData);
+
+        alert('Blockchain poll created successfully!');
+        navigate('/polls');
+      } catch (error) {
+        console.error('Error creating blockchain poll:', error);
+        alert('Error creating blockchain poll. See console for details.');
+      }
+    } else {
+      // Handle normal poll creation
+      try {
+        const pollData = {
+          title,
+          description,
+          options,
+          type: 'normal',
+        };
+
+        await axios.post('/polls', pollData);
+        alert('Normal poll created successfully!');
+        navigate('/polls');
+      } catch (error) {
+        console.error('Error creating normal poll:', error);
+        alert('Error creating normal poll. See console for details.');
+      }
     }
   };
 
@@ -92,6 +128,15 @@ const CreatePoll = ({ user }) => {
       <main className="create-poll-container">
         <h2>Create a New Poll</h2>
         <form onSubmit={handleSubmit}>
+          {/* Poll Type Selection */}
+          <div className="form-group">
+            <label>Poll Type:</label>
+            <select value={pollType} onChange={(e) => setPollType(e.target.value)}>
+              <option value="normal">Normal Poll</option>
+              <option value="blockchain">Blockchain Poll</option>
+            </select>
+          </div>
+
           <div className="form-group">
             <label>Title:</label>
             <input value={title} onChange={(e) => setTitle(e.target.value)} required />

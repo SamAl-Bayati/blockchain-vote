@@ -7,24 +7,49 @@ import axios from 'axios';
 
 const PollResults = ({ user }) => {
   const { pollId } = useParams();
-  const [poll, setPoll] = useState(null);
+  
+  // Separate states for poll metadata and options
+  const [pollMetadata, setPollMetadata] = useState(null);
+  const [pollOptions, setPollOptions] = useState([]);
+  const [isBlockchainPoll, setIsBlockchainPoll] = useState(false);
   const [contractInfo, setContractInfo] = useState(null);
 
   useEffect(() => {
-    const fetchContractInfo = async () => {
+    const fetchPollResults = async () => {
       try {
-        const response = await axios.get('/contract-info');
-        setContractInfo(response.data);
+        // Fetch poll results from the backend
+        const response = await axios.get(`/polls/${pollId}/results`);
+        const pollData = response.data.poll;
+        const optionsData = response.data.options;
+
+        setPollMetadata(pollData);
+        setPollOptions(optionsData);
+        setIsBlockchainPoll(pollData.type === 'blockchain');
       } catch (error) {
-        console.error('Error fetching contract info:', error);
+        console.error('Error fetching poll results:', error);
       }
     };
 
-    fetchContractInfo();
-  }, []);
+    fetchPollResults();
+  }, [pollId]);
 
   useEffect(() => {
-    const loadPollResults = async () => {
+    if (isBlockchainPoll) {
+      const fetchContractInfo = async () => {
+        try {
+          const response = await axios.get('/contract-info');
+          setContractInfo(response.data);
+        } catch (error) {
+          console.error('Error fetching contract info:', error);
+        }
+      };
+
+      fetchContractInfo();
+    }
+  }, [isBlockchainPoll]);
+
+  useEffect(() => {
+    const loadBlockchainPollResults = async () => {
       if (!window.ethereum || !contractInfo) return;
 
       try {
@@ -60,45 +85,54 @@ const PollResults = ({ user }) => {
           options.push({ id: i, text: option[0], voteCount: voteCount });
         }
 
-        setPoll({
+        setPollMetadata({
           id: pollData[0].toNumber(),
           title: pollData[2],
           description: pollData[3],
-          options: options,
           totalVotes: totalVotes,
         });
+        setPollOptions(options);
       } catch (error) {
-        console.error('Error loading poll results:', error);
+        console.error('Error loading blockchain poll results:', error);
       }
     };
 
-    if (contractInfo) {
-      loadPollResults();
+    if (isBlockchainPoll && contractInfo) {
+      loadBlockchainPollResults();
     }
-  }, [pollId, contractInfo]);
+  }, [pollId, isBlockchainPoll, contractInfo]);
 
-  if (!poll) {
+  if (!pollMetadata || pollOptions.length === 0) {
     return <div>Loading...</div>;
   }
+
+  const totalVotes = isBlockchainPoll
+    ? pollMetadata.totalVotes
+    : pollOptions.reduce((sum, option) => sum + parseInt(option.votes_count || 0), 0);
 
   return (
     <div>
       <Header user={user} />
       <main className="poll-results-container">
-        <h2>Results for: {poll.title}</h2>
-        <p>{poll.description}</p>
+        <h2>Results for: {pollMetadata.title}</h2>
+        <p>{pollMetadata.description}</p>
         <ul className="results-list">
-          {poll.options.map((option) => (
-            <li key={option.id}>
-              <span>{option.text}</span>
-              <span>{option.voteCount} votes</span>
-              <span>
-                {poll.totalVotes > 0
-                  ? ((option.voteCount / poll.totalVotes) * 100).toFixed(2) + '%'
-                  : '0%'}
-              </span>
-            </li>
-          ))}
+          {pollOptions.map((option) => {
+            const voteCount = isBlockchainPoll
+              ? option.voteCount
+              : parseInt(option.votes_count || 0);
+
+            const percentage =
+              totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(2) + '%' : '0%';
+
+            return (
+              <li key={option.id}>
+                <span>{option.text}</span>
+                <span>{voteCount} votes</span>
+                <span>{percentage}</span>
+              </li>
+            );
+          })}
         </ul>
       </main>
     </div>
