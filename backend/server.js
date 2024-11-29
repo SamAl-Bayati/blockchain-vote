@@ -12,6 +12,7 @@ const { Pool } = require('pg');
 const helmet = require('helmet');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
+const fs = require('fs');
 const path = require('path');
 
 // First declare the environment variables 
@@ -268,13 +269,17 @@ app.post(
 
 app.get('/contract-info', (req, res) => {
   const contractAddress = process.env.CONTRACT_ADDRESS;
-  const abiPath = path.join(__dirname, 'artifacts/contracts/poll.sol/PollContract.json');
+  const abiPath = path.join(__dirname, 'artifacts/contracts/poll.sol/PollContract.json'); // Updated path
 
-  console.log('ABI Path:', abiPath); // Add logging to verify the path
+  // Logging for debugging
+  console.log('ABI file path:', abiPath);
+  console.log('Does ABI file exist?', fs.existsSync(abiPath));
 
   let abi;
   try {
-    abi = require(abiPath).abi;
+    const abiFileContent = fs.readFileSync(abiPath, 'utf8');
+    const abiJson = JSON.parse(abiFileContent);
+    abi = abiJson.abi;
   } catch (error) {
     console.error('Error reading ABI file:', error);
     return res.status(500).json({ error: 'Failed to load contract ABI from server.' });
