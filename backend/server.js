@@ -267,9 +267,15 @@ app.post(
 );
 
 app.get('/contract-info', (req, res) => {
-  const contractAddress = process.env.CONTRACT_ADDRESS; // Set this in Render environment variables
+  const contractAddress = process.env.CONTRACT_ADDRESS;
   const abiPath = path.join(__dirname, 'artifacts/contracts/Poll.sol/PollContract.json');
-  const abi = require(abiPath).abi;
+  let abi;
+  try {
+    abi = require(abiPath).abi;
+  } catch (error) {
+    console.error('Error reading ABI file:', error);
+    return res.status(500).json({ error: 'Failed to load contract ABI from server.' });
+  }
 
   res.json({ contractAddress, abi });
 });
