@@ -12,6 +12,7 @@ const { Pool } = require('pg');
 const helmet = require('helmet');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
+const path = require('path');
 
 // First declare the environment variables 
 const FRONTEND_URL = process.env.NODE_ENV === 'development' 
@@ -264,6 +265,14 @@ app.post(
     })(req, res, next);
   }
 );
+
+app.get('/contract-info', (req, res) => {
+  const contractAddress = process.env.CONTRACT_ADDRESS; // Set this in Render environment variables
+  const abiPath = path.join(__dirname, 'artifacts/contracts/Poll.sol/PollContract.json');
+  const abi = require(abiPath).abi;
+
+  res.json({ contractAddress, abi });
+});
 
 // OAuth routes
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

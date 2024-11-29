@@ -26,6 +26,20 @@ const CreatePoll = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    if (!window.ethereum) {
+      alert('Please install MetaMask to interact with the blockchain.');
+      return;
+    }
+  
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const { chainId } = await provider.getNetwork();
+  
+    if (chainId !== 11155111) { // 11155111 is the chain ID for Sepolia
+      alert('Please switch your MetaMask network to Sepolia Test Network.');
+      return;
+    }
+    
     try {
       await axios.post('/polls', {
         title,
