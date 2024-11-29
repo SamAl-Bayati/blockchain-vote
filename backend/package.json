@@ -25,7 +25,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "npx hardhat compile"
   },
   "main": "server.js",
   "devDependencies": {
@@ -40,5 +41,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "Backend server for AI Realtor app"
+  "description": "Backend server for evote app"
 }
