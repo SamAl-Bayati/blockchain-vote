@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 import axios from 'axios';
 
 const AnswerPoll = ({ user }) => {
-  const { pollId } = useParams();
+  const { pollId } = useParams(); // This is the database poll ID
   const navigate = useNavigate();
 
   // Separate states for poll metadata and options
@@ -17,6 +17,9 @@ const AnswerPoll = ({ user }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [contractInfo, setContractInfo] = useState(null);
+
+  // New state to store blockchainId
+  const [blockchainId, setBlockchainId] = useState(null);
 
   useEffect(() => {
     const fetchPoll = async () => {
@@ -29,6 +32,11 @@ const AnswerPoll = ({ user }) => {
         setPollMetadata(pollData);
         setPollOptions(optionsData);
         setIsBlockchainPoll(pollData.type === 'blockchain');
+
+        // Set the blockchainId if it's a blockchain poll
+        if (pollData.type === 'blockchain') {
+          setBlockchainId(pollData.blockchain_id);
+        }
 
         // Check if the user has already voted (for normal polls)
         if (pollData.type === 'normal') {
@@ -60,7 +68,7 @@ const AnswerPoll = ({ user }) => {
 
   useEffect(() => {
     const loadBlockchainPollData = async () => {
-      if (!window.ethereum || !contractInfo) return;
+      if (!window.ethereum || !contractInfo || blockchainId === null) return;
 
       try {
         // Request account access first
@@ -82,34 +90,34 @@ const AnswerPoll = ({ user }) => {
           signer
         );
 
-        const pollData = await pollContract.getPoll(pollId);
+        const pollData = await pollContract.getPoll(blockchainId);
         const options = [];
 
         for (let i = 0; i < pollData[4]; i++) {
-          const option = await pollContract.getOption(pollId, i);
+          const option = await pollContract.getOption(blockchainId, i);
           options.push({ id: i, text: option[0], voteCount: option[1].toNumber() });
         }
 
-        setPollMetadata({
-          id: pollData[0].toNumber(),
+        setPollMetadata((prev) => ({
+          ...prev,
           creator: pollData[1],
           title: pollData[2],
           description: pollData[3],
-        });
+        }));
         setPollOptions(options);
 
         // Check if user has already voted
-        const hasVoted = await pollContract.voters(pollId, await signer.getAddress());
+        const hasVoted = await pollContract.voters(blockchainId, await signer.getAddress());
         setHasVoted(hasVoted);
       } catch (error) {
         console.error('Error loading blockchain poll data:', error);
       }
     };
 
-    if (isBlockchainPoll && contractInfo) {
+    if (isBlockchainPoll && contractInfo && blockchainId !== null) {
       loadBlockchainPollData();
     }
-  }, [pollId, isBlockchainPoll, contractInfo]);
+  }, [blockchainId, isBlockchainPoll, contractInfo]);
 
   const handleVote = async () => {
     if (selectedOption === null) {
@@ -118,7 +126,7 @@ const AnswerPoll = ({ user }) => {
     }
 
     if (isBlockchainPoll) {
-      if (!window.ethereum || !contractInfo) return;
+      if (!window.ethereum || !contractInfo || blockchainId === null) return;
 
       try {
         // Request account access first
@@ -140,7 +148,7 @@ const AnswerPoll = ({ user }) => {
           signer
         );
 
-        const tx = await pollContract.vote(pollId, selectedOption);
+        const tx = await pollContract.vote(blockchainId, selectedOption);
         await tx.wait();
 
         alert('Your vote has been recorded on the blockchain.');

@@ -1,3 +1,5 @@
+// PollsList.jsx
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../Home/Header';
@@ -28,6 +30,10 @@ const PollsList = ({ user, onLogout }) => {
                 Created by: {poll.first_name} {poll.last_name}
               </p>
               <p>Type: {poll.type === 'blockchain' ? 'Blockchain Poll' : 'Normal Poll'}</p>
+              {/* Optional: Display blockchain ID */}
+              {poll.type === 'blockchain' && (
+                <p>Blockchain ID: {poll.blockchain_id}</p>
+              )}
               <Link to={`/polls/${poll.id}`}>View Poll</Link>
             </li>
           ))}

@@ -1,3 +1,5 @@
+// PollResults.jsx
+
 import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
 import '../../styles/Polls/PollResults.css';
@@ -6,13 +8,16 @@ import { ethers } from 'ethers';
 import axios from 'axios';
 
 const PollResults = ({ user }) => {
-  const { pollId } = useParams();
-  
+  const { pollId } = useParams(); // This is the database poll ID
+
   // Separate states for poll metadata and options
   const [pollMetadata, setPollMetadata] = useState(null);
   const [pollOptions, setPollOptions] = useState([]);
   const [isBlockchainPoll, setIsBlockchainPoll] = useState(false);
   const [contractInfo, setContractInfo] = useState(null);
+
+  // New state to store blockchainId
+  const [blockchainId, setBlockchainId] = useState(null);
 
   useEffect(() => {
     const fetchPollResults = async () => {
@@ -25,6 +30,11 @@ const PollResults = ({ user }) => {
         setPollMetadata(pollData);
         setPollOptions(optionsData);
         setIsBlockchainPoll(pollData.type === 'blockchain');
+
+        // Set the blockchainId if it's a blockchain poll
+        if (pollData.type === 'blockchain') {
+          setBlockchainId(pollData.blockchain_id);
+        }
       } catch (error) {
         console.error('Error fetching poll results:', error);
       }
@@ -50,7 +60,7 @@ const PollResults = ({ user }) => {
 
   useEffect(() => {
     const loadBlockchainPollResults = async () => {
-      if (!window.ethereum || !contractInfo) return;
+      if (!window.ethereum || !contractInfo || blockchainId === null) return;
 
       try {
         // Request account access first
@@ -58,8 +68,6 @@ const PollResults = ({ user }) => {
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const { chainId } = await provider.getNetwork();
-        console.log('Chain ID:', chainId);
-        console.log('Type of Chain ID:', typeof chainId);
 
         if (chainId !== 11155111) {
           alert('Please switch your MetaMask network to Sepolia Test Network.');
@@ -74,33 +82,33 @@ const PollResults = ({ user }) => {
           signer
         );
 
-        const pollData = await pollContract.getPoll(pollId);
+        const pollData = await pollContract.getPoll(blockchainId);
         const options = [];
         let totalVotes = 0;
 
         for (let i = 0; i < pollData[4]; i++) {
-          const option = await pollContract.getOption(pollId, i);
+          const option = await pollContract.getOption(blockchainId, i);
           const voteCount = option[1].toNumber();
           totalVotes += voteCount;
           options.push({ id: i, text: option[0], voteCount: voteCount });
         }
 
-        setPollMetadata({
-          id: pollData[0].toNumber(),
+        setPollMetadata((prev) => ({
+          ...prev,
           title: pollData[2],
           description: pollData[3],
           totalVotes: totalVotes,
-        });
+        }));
         setPollOptions(options);
       } catch (error) {
         console.error('Error loading blockchain poll results:', error);
       }
     };
 
-    if (isBlockchainPoll && contractInfo) {
+    if (isBlockchainPoll && contractInfo && blockchainId !== null) {
       loadBlockchainPollResults();
     }
-  }, [pollId, isBlockchainPoll, contractInfo]);
+  }, [blockchainId, isBlockchainPoll, contractInfo]);
 
   if (!pollMetadata || pollOptions.length === 0) {
     return <div>Loading...</div>;
