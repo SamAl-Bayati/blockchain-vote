@@ -112,6 +112,13 @@ app.use(
   })
 );
 
+const corsOptions = {
+  origin: 'https://your-frontend-domain.com', // Replace with your frontend domain
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 // Session and Passport middleware
 app.use(session(sessionConfig));
 app.use(passport.initialize());
