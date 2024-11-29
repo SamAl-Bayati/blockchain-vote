@@ -268,7 +268,9 @@ app.post(
 
 app.get('/contract-info', (req, res) => {
   const contractAddress = process.env.CONTRACT_ADDRESS;
-  const abiPath = path.join(__dirname, 'artifacts/contracts/Poll.sol/PollContract.json');
+  const artifactsPath = process.env.ARTIFACTS_PATH || path.join(__dirname, 'artifacts');
+  const abiPath = path.join(artifactsPath, 'contracts/Poll.sol/PollContract.json');
+
   let abi;
   try {
     abi = require(abiPath).abi;
