@@ -112,13 +112,6 @@ app.use(
   })
 );
 
-const corsOptions = {
-  origin: 'https://your-frontend-domain.com', // Replace with your frontend domain
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
 // Session and Passport middleware
 app.use(session(sessionConfig));
 app.use(passport.initialize());
@@ -370,7 +363,7 @@ app.post(
     body('description').optional().isString(),
     body('options').isArray({ min: 2 }),
     body('type').isIn(['normal', 'blockchain']),
-    body('id').optional().isInt(),
+    body('blockchainId').optional().isInt(), // Changed from 'id' to 'blockchainId'
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -379,26 +372,16 @@ app.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { id, title, description, options, type } = req.body;
+    const { blockchainId, title, description, options, type } = req.body; // Changed 'id' to 'blockchainId'
     const userId = req.user.id;
 
     try {
-      let pollResult;
-      if (id) {
-        // For blockchain polls
-        pollResult = await pool.query(
-          `INSERT INTO polls (id, user_id, title, description, type)
-           VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-          [id, userId, title, description, type]
-        );
-      } else {
-        // For normal polls
-        pollResult = await pool.query(
-          `INSERT INTO polls (user_id, title, description, type)
-           VALUES ($1, $2, $3, $4) RETURNING *`,
-          [userId, title, description, type]
-        );
-      }
+      // Insert the poll, including blockchainId if provided
+      const pollResult = await pool.query(
+        `INSERT INTO polls (user_id, title, description, type, blockchain_id)
+         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+        [userId, title, description, type, blockchainId || null]
+      );
 
       const pollId = pollResult.rows[0].id;
 
@@ -418,8 +401,8 @@ app.post(
         options: optionResults.map((result) => result.rows[0]),
       });
     } catch (error) {
-      console.error('Error creating poll:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error creating poll:', error.stack);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   }
 );

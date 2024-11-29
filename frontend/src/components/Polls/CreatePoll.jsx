@@ -1,3 +1,5 @@
+// CreatePoll.jsx
+
 import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
 import '../../styles/Polls/CreatePoll.css';
@@ -81,11 +83,11 @@ const CreatePoll = ({ user }) => {
 
         // Get the new poll ID from the blockchain
         const pollCount = await pollContract.pollCount();
-        const newPollId = pollCount.toNumber();
+        const newPollId = pollCount.toNumber() - 1; // Adjusted to get the correct poll ID
 
         // Send poll data to the backend for synchronization
         const pollData = {
-          id: newPollId,
+          blockchainId: newPollId, // Changed 'id' to 'blockchainId'
           title,
           description,
           options,
