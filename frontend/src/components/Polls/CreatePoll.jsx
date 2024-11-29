@@ -62,10 +62,8 @@ const CreatePoll = ({ user }) => {
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const { chainId } = await provider.getNetwork();
-        console.log('Chain ID:', chainId);
-        console.log('Type of Chain ID:', typeof chainId);
 
-        if (chainId !== 11155111) { // Sepolia's chain ID
+        if (chainId !== 11155111) {
           alert('Please switch your MetaMask network to Sepolia Test Network.');
           return;
         }
@@ -146,15 +144,24 @@ const CreatePoll = ({ user }) => {
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
           <div className="form-group">
-            <label>Poll Type:</label>
-            <select
-              value={pollType}
-              onChange={(e) => setPollType(e.target.value)}
-              required
-            >
-              <option value="normal">Normal Poll</option>
-              <option value="blockchain">Blockchain Poll</option>
-            </select>
+            <label>Options:</label>
+            {options.map((option, index) => (
+              <div key={index} className="option-input">
+                <input
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  required
+                />
+                {options.length > 2 && (
+                  <button type="button" onClick={() => removeOption(index)}>
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+            <button type="button" onClick={addOption}>
+              Add Option
+            </button>
           </div>
           <button type="submit">Create Poll</button>
         </form>
