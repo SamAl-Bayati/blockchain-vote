@@ -325,6 +325,22 @@ app.get('/auth/user', (req, res) => {
   }
 });
 
+app.put('/auth/user', ensureAuthenticated, async (req, res) => {
+  const userId = req.user.id;
+  const { firstName, lastName, email } = req.body;
+
+  try {
+    await pool.query(
+      `UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4`,
+      [firstName, lastName, email, userId]
+    );
+    res.json({ message: 'User updated successfully' });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Logout route
 app.get('/auth/logout', (req, res) => {
   console.log('Logout requested');
@@ -529,4 +545,14 @@ app.get('/polls/:pollId/hasVoted', ensureAuthenticated, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log('Environment:', process.env.NODE_ENV);
+});
+
+// Catch unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Catch uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception thrown:', err);
 });

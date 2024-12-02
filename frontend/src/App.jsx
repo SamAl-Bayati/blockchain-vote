@@ -101,7 +101,7 @@ function App() {
             path="/polls/create"
             element={
               <PrivateRoute user={user}>
-                <CreatePoll user={user} />
+                <CreatePoll user={user} onLogout={handleLogout} />
               </PrivateRoute>
             }
           />
@@ -109,7 +109,7 @@ function App() {
             path="/polls/:pollId"
             element={
               <PrivateRoute user={user}>
-                <AnswerPoll user={user} />
+                <AnswerPoll user={user} onLogout={handleLogout} />
               </PrivateRoute>
             }
           />
@@ -117,7 +117,7 @@ function App() {
             path="/polls/:pollId/results"
             element={
               <PrivateRoute user={user}>
-                <PollResults user={user} />
+                <PollResults user={user} onLogout={handleLogout} />
               </PrivateRoute>
             }
           />
@@ -125,7 +125,7 @@ function App() {
             path="/account"
             element={
               <PrivateRoute user={user}>
-                <AccountSettings user={user} />
+                <AccountSettings user={user} onLogout={handleLogout} />
               </PrivateRoute>
             }
           />

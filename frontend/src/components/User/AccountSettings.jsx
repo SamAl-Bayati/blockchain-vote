@@ -3,7 +3,7 @@ import axios from 'axios';
 import Header from '../Home/Header';
 import '../../styles/User/AccountSettings.css';
 
-const AccountSettings = ({ user }) => {
+const AccountSettings = ({ user, onLogout }) => {
   const [firstName, setFirstName] = useState(user.firstName || '');
   const [lastName, setLastName] = useState(user.lastName || '');
   const [email, setEmail] = useState(user.email || '');
@@ -11,18 +11,22 @@ const AccountSettings = ({ user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Implement the update user API call here
-      // For now, we'll just log the data
-      console.log('Updated user info:', { firstName, lastName, email });
+      const response = await axios.put('/auth/user', {
+        firstName,
+        lastName,
+        email,
+      });
+      console.log('User updated successfully:', response.data);
       alert('Account settings updated successfully.');
     } catch (error) {
       console.error('Error updating account settings:', error);
+      alert('Error updating account settings.');
     }
   };
 
   return (
     <div>
-      <Header user={user} />
+      <Header user={user} onLogout={onLogout} />
       <main className="account-settings-container">
         <h2>Account Settings</h2>
         <form onSubmit={handleSubmit}>

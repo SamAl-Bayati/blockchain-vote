@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
 import axios from 'axios';
 
-const AnswerPoll = ({ user }) => {
+const AnswerPoll = ({ user, onLogout }) => {
   const { pollId } = useParams(); // This is the database poll ID
   const navigate = useNavigate();
 
@@ -51,25 +51,33 @@ const AnswerPoll = ({ user }) => {
     fetchPoll();
   }, [pollId]);
 
-
   useEffect(() => {
-    if (isBlockchainPoll) {
-      const fetchContractInfo = async () => {
-        try {
-          const response = await axios.get('/contract-info');
-          setContractInfo(response.data);
-        } catch (error) {
-          console.error('Error fetching contract info:', error);
-        }
-      };
+    const fetchContractInfo = async () => {
+      try {
+        const response = await axios.get('/contract-info');
+        setContractInfo(response.data);
+      } catch (error) {
+        console.error('Error fetching contract info:', error);
+      }
+    };
 
-      fetchContractInfo();
-    }
-  }, [isBlockchainPoll]);
+    fetchContractInfo();
+  }, []);
 
   useEffect(() => {
     const loadBlockchainPollData = async () => {
-      if (!window.ethereum || !contractInfo || blockchainId === null) return;
+      if (!window.ethereum) {
+        alert('MetaMask is not installed. Please install MetaMask to interact with the blockchain.');
+        return;
+      }
+      if (!contractInfo) {
+        console.error('Contract info not loaded yet.');
+        return;
+      }
+      if (blockchainId === null) {
+        console.error('Blockchain poll ID is not available.');
+        return;
+      }
 
       try {
         // Request account access first
@@ -127,7 +135,18 @@ const AnswerPoll = ({ user }) => {
     }
 
     if (isBlockchainPoll) {
-      if (!window.ethereum || !contractInfo || blockchainId === null) return;
+      if (!window.ethereum) {
+        alert('MetaMask is not installed. Please install MetaMask to interact with the blockchain.');
+        return;
+      }
+      if (!contractInfo) {
+        alert('Contract information not loaded yet.');
+        return;
+      }
+      if (blockchainId === null) {
+        alert('Blockchain poll ID is not available.');
+        return;
+      }
 
       try {
         // Request account access first
@@ -186,7 +205,7 @@ const AnswerPoll = ({ user }) => {
 
   return (
     <div>
-      <Header user={user} />
+      <Header user={user} onLogout={onLogout} />
       <main className="answer-poll-container">
         <h2>{pollMetadata.title}</h2>
         <p>{pollMetadata.description}</p>
@@ -212,7 +231,9 @@ const AnswerPoll = ({ user }) => {
           ))}
         </div>
         {!hasVoted ? (
-          <button onClick={handleVote}>Submit Vote</button>
+          <button onClick={handleVote} disabled={isBlockchainPoll && !contractInfo}>
+            Submit Vote
+          </button>
         ) : (
           <button onClick={viewResults}>View Results</button>
         )}
