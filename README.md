@@ -20,8 +20,7 @@
     - [Smart Contract Deployment](#smart-contract-deployment-cloud)
 8. [Usage](#usage)
 9. [Troubleshooting](#troubleshooting)
-10. [Contributing](#contributing)
-11. [License](#license)
+10. [License](#license)
 
 **Features**
 
