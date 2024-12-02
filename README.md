@@ -1,8 +1,8 @@
-**eVote**
+## eVote
 
 **eVote** is a secure, blockchain-based voting application that allows users to create and participate in polls. The project comprises a backend server built with Node.js and Express, a frontend application developed using React, and smart contracts deployed on the blockchain using Hardhat. This README provides comprehensive instructions on how to set up and run the project on your local machine or deploy it using a cloud service provider.
 
-**Table of Contents**
+### Table of Contents
 
 1. [Features](#features)
 2. [Technology Stack](#technology-stack)
@@ -31,7 +31,7 @@
 - **Account Settings:** Update user information securely.
 - **Security:** Implements best practices including rate limiting, input validation, and secure session management.
 
-**Technology Stack**
+### Technology Stack
 
 - **Backend:** Node.js, Express, Passport.js, PostgreSQL, Redis, Hardhat
 - **Frontend:** React, React Router, Axios, Ethers.js
@@ -39,7 +39,7 @@
 - **Authentication:** Google OAuth 2.0, Local Strategy
 - **Deployment:** Supports deployment on cloud platforms like Render, Heroku, AWS, etc.
 
-**Prerequisites**
+### Prerequisites
 
 Before you begin, ensure you have met the following requirements:
 
@@ -50,7 +50,7 @@ Before you begin, ensure you have met the following requirements:
 - **MetaMask** extension installed in your browser for blockchain interactions.
 - **Hardhat** for smart contract development.
 
-**Installation**
+### Installation
 
 Follow these steps to set up and run the project on your local machine.
 
@@ -62,7 +62,7 @@ git clone <https://github.com/SamAlbayati2/blockchain-vote>
 
 `
 
-**2\. Backend Setup**
+### 2\. Backend Setup
 
 **a. Navigate to the Backend Directory**
 
@@ -80,7 +80,7 @@ Ensure you are in the backend directory and run:
 npm install
 `
 
-**c. Configure Environment Variables**
+### c. Configure Environment Variables
 
 Create a .env file in the backend directory based on the provided .env template. You can copy the sample .env and fill in your own values.
 
@@ -135,7 +135,7 @@ ARTIFACTS_PATH=../artifacts
 - CONTRACT_ADDRESS: Address of the deployed PollContract.
 - ARTIFACTS_PATH: Path to smart contract artifacts.
 
-**d. Database Setup**
+### d. Database Setup
 
 Ensure PostgreSQL is installed and running. Create the required database and tables.
 
@@ -339,7 +339,7 @@ npm start
 
 The frontend should start on <http://localhost:3000> and automatically open in your default browser.
 
-**4\. Smart Contract Deployment**
+### 4\. Smart Contract Deployment
 
 **a. Navigate to the Backend Directory**
 
@@ -418,7 +418,7 @@ If you followed the [Database Setup](#database-setup) section in the Backend Set
 
 Ensure that both the backend and frontend have their respective .env files configured with the necessary environment variables. Refer to the [Backend Setup](#backend-setup) and [Frontend Setup](#frontend-setup) sections for detailed information.
 
-**Running the Application Locally**
+### Running the Application Locally
 
 After completing the installation steps:
 
@@ -445,11 +445,11 @@ npm start
 
 Open your browser and navigate to <http://localhost:3000>.
 
-**Deployment to Cloud Services**
+### Deployment to Cloud Services**
 
 You can deploy the backend and frontend to cloud service providers like [Render](https://render.com/), [Heroku](https://www.heroku.com/), [AWS](https://aws.amazon.com/), etc. Below are general guidelines for deploying to cloud platforms.
 
-**1\. Backend Deployment**
+### 1\. Backend Deployment**
 
 **a. Choose a Cloud Provider**
 
@@ -469,7 +469,7 @@ Render will automatically build and deploy your backend service. Ensure that the
 
 Render provides automatic SSL. Ensure that your frontend is aware of the deployed backend URL.
 
-**2\. Frontend Deployment**
+### 2\. Frontend Deployment**
 
 **a. Choose a Cloud Provider**
 
@@ -485,7 +485,7 @@ For example, using **Render** or **Vercel**:
 
 The platform will build and deploy your frontend application. Ensure that API calls point to the correct backend URL.
 
-**3\. Smart Contract Deployment on Cloud**
+### 3\. Smart Contract Deployment on Cloud**
 
 If deploying smart contracts directly from a cloud server:
 
