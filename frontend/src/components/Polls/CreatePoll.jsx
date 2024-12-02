@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
 import axios from 'axios';
 
-const CreatePoll = ({ user }) => {
+const CreatePoll = ({ user, onLogout }) => {
   const [pollType, setPollType] = useState('normal'); // New state for poll type
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -78,16 +78,21 @@ const CreatePoll = ({ user }) => {
           signer
         );
 
+        // Create the poll and wait for the transaction to be mined
         const tx = await pollContract.createPoll(title, description, options);
-        await tx.wait();
+        const receipt = await tx.wait();
 
-        // Get the new poll ID from the blockchain
-        const pollCount = await pollContract.pollCount();
-        const newPollId = pollCount.toNumber() - 1; // Adjusted to get the correct poll ID
+        // Parse the event logs to get the poll ID
+        const event = receipt.events.find((event) => event.event === 'PollCreated');
+        if (!event) {
+          throw new Error('PollCreated event not found in transaction receipt.');
+        }
+
+        const newPollId = event.args.id.toNumber(); // Updated to match the event parameter name
 
         // Send poll data to the backend for synchronization
         const pollData = {
-          blockchainId: newPollId, // Changed 'id' to 'blockchainId'
+          blockchainId: newPollId, // Ensure this matches the backend's expected field
           title,
           description,
           options,
@@ -124,7 +129,7 @@ const CreatePoll = ({ user }) => {
 
   return (
     <div>
-      <Header user={user} />
+      <Header user={user} onLogout={onLogout} />
       <main className="create-poll-container">
         <h2>Create a New Poll</h2>
         <form onSubmit={handleSubmit}>
