@@ -4,7 +4,7 @@
 
 **Table of Contents**
 
-1. [Features](#features)
+1. [Features](###features)
 2. [Technology Stack](#technology-stack)
 3. [Prerequisites](#prerequisites)
 4. [Installation](#installation)
@@ -22,7 +22,7 @@
 9. [Troubleshooting](#troubleshooting)
 10. [License](#license)
 
-**Features**
+###Features
 
 - **User Authentication:** Register and log in using email/password or Google OAuth 2.0.
 - **Poll Management:** Create, view, and participate in polls.
