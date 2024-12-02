@@ -22,7 +22,7 @@
 9. [Troubleshooting](#troubleshooting)
 10. [License](#license)
 
-## Features
+### Features
 
 - **User Authentication:** Register and log in using email/password or Google OAuth 2.0.
 - **Poll Management:** Create, view, and participate in polls.
