@@ -54,7 +54,7 @@ Before you begin, ensure you have met the following requirements:
 
 Follow these steps to set up and run the project on your local machine.
 
-**1\. Clone the Repository**
+**Clone the Repository**
 
 `
 
@@ -62,7 +62,7 @@ git clone <https://github.com/SamAlbayati2/blockchain-vote>
 
 `
 
-### 2\. Backend Setup
+#### Backend Setup
 
 **a. Navigate to the Backend Directory**
 
