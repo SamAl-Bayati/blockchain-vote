@@ -46,9 +46,9 @@ Before you begin, ensure you have the following installed on your system:
 **Installation**
 
 **1\. Clone the Repository**
-
+`
 bash
-
+`
 Copy code
 
 git clone <https://github.com/yourusername/evote.git>
