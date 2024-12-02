@@ -94,7 +94,7 @@
   
   .home-main {
     flex: 1; /* Allows the main content to expand and fill available space */
-    padding: 2rem; /* Optional: add some padding */
+    padding: 2rem;
   }
   
   /* Custom select styling */

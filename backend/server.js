@@ -15,21 +15,18 @@ const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 
-// First declare the environment variables
 const FRONTEND_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:3000'
-  : 'https://evote-89pd.onrender.com'; // Replace with your frontend URL
+  : 'https://evote-89pd.onrender.com';
 
 const BACKEND_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000'
-  : 'https://api-evote.onrender.com'; // Replace with your backend URL
+  : 'https://api-evote.onrender.com';
 
-// Force development mode if needed
 if (process.env.NODE_ENV !== 'production') {
   process.env.NODE_ENV = 'development';
 }
 
-// Then log them
 console.log('Current environment:', process.env.NODE_ENV);
 console.log('Frontend URL:', FRONTEND_URL);
 console.log('Backend URL:', BACKEND_URL);
@@ -37,27 +34,25 @@ console.log('Backend URL:', BACKEND_URL);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware setup
 app.use(helmet());
 app.use(express.json());
-app.set('trust proxy', 1); // Trust first proxy
+app.set('trust proxy', 1);
 
-// Rate limiter
+// Rate limiting to prevent abuse
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 100, // Limit each IP to 100 requests per window
 });
 app.use(limiter);
 
-// Database pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // Adjust based on your SSL configuration
+    rejectUnauthorized: false,
   },
 });
 
-// Helper functions for user
+// Helper functions to interact with the database
 async function findUserByGoogleId(googleId) {
   const result = await pool.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
   return result.rows[0];
@@ -78,7 +73,6 @@ async function findUserById(id) {
   return result.rows[0];
 }
 
-// Session configuration
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'your_secret_key',
   resave: false,
@@ -91,7 +85,7 @@ const sessionConfig = {
   },
 };
 
-// Configure Redis for production environment
+// Configure Redis for session storage in production
 if (process.env.NODE_ENV === 'production') {
   const redisClient = redis.createClient({
     url: process.env.REDIS_URL,
@@ -104,7 +98,6 @@ if (process.env.NODE_ENV === 'production') {
   sessionConfig.store = new RedisStore({ client: redisClient });
 }
 
-// CORS settings
 app.use(
   cors({
     origin: FRONTEND_URL,
@@ -112,12 +105,11 @@ app.use(
   })
 );
 
-// Session and Passport middleware
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport strategies
+// Configure Passport with Google OAuth strategy
 passport.use(
   new GoogleStrategy(
     {
@@ -144,6 +136,7 @@ passport.use(
   )
 );
 
+// Configure Passport with Local strategy for email/password authentication
 passport.use(
   new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
     try {
@@ -166,11 +159,12 @@ passport.use(
   })
 );
 
-// Serialize and deserialize user
+// Serialize user ID to store in session
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
+// Deserialize user from session using the stored ID
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await findUserById(id);
@@ -180,7 +174,9 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Authentication routes
+// Authentication Routes
+
+// Register a new user
 app.post(
   '/auth/register',
   [
@@ -239,6 +235,7 @@ app.post(
   }
 );
 
+// Log in an existing user
 app.post(
   '/auth/login',
   [body('email').isEmail(), body('password').exists()],
@@ -267,44 +264,38 @@ app.post(
   }
 );
 
+// Retrieve contract information
 app.get('/contract-info', (req, res) => {
   const contractAddress = process.env.CONTRACT_ADDRESS;
-  const abiPath = path.join(__dirname, 'artifacts/contracts/poll.sol/PollContract.json'); // Updated path
+  const abiPath = path.join(__dirname, 'artifacts/contracts/poll.sol/PollContract.json');
 
-  // Logging for debugging
-  console.log('ABI file path:', abiPath);
-  console.log('Does ABI file exist?', fs.existsSync(abiPath));
-
-  let abi;
   try {
     const abiFileContent = fs.readFileSync(abiPath, 'utf8');
     const abiJson = JSON.parse(abiFileContent);
-    abi = abiJson.abi;
+    const abi = abiJson.abi;
+    res.json({ contractAddress, abi });
   } catch (error) {
     console.error('Error reading ABI file:', error);
     return res.status(500).json({ error: 'Failed to load contract ABI from server.' });
   }
-
-  res.json({ contractAddress, abi });
 });
 
-// OAuth routes
+// OAuth Routes
+
+// Initiate Google OAuth
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+// Handle Google OAuth callback
 app.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    console.log('Authenticated user:', req.user);
-    console.log('Redirecting to:', `${FRONTEND_URL}`);
     res.redirect(`${FRONTEND_URL}`);
   }
 );
 
-// Route to check if the user is authenticated
+// Check if the user is authenticated
 app.get('/auth/user', (req, res) => {
-  console.log('Full req.user object:', req.user);
-
   if (req.isAuthenticated() && req.user) {
     const userData = {
       user: {
@@ -317,14 +308,13 @@ app.get('/auth/user', (req, res) => {
         }`,
       },
     };
-    console.log('Sending user data to frontend:', userData);
     res.json(userData);
   } else {
-    console.log('No authenticated user found');
     res.status(401).json({ message: 'Unauthorized' });
   }
 });
 
+// Update user information
 app.put('/auth/user', ensureAuthenticated, async (req, res) => {
   const userId = req.user.id;
   const { firstName, lastName, email } = req.body;
@@ -341,9 +331,8 @@ app.put('/auth/user', ensureAuthenticated, async (req, res) => {
   }
 });
 
-// Logout route
+// Logout the user
 app.get('/auth/logout', (req, res) => {
-  console.log('Logout requested');
   req.logout((err) => {
     if (err) {
       console.error('Logout error:', err);
@@ -354,7 +343,6 @@ app.get('/auth/logout', (req, res) => {
         console.error('Session destruction error:', err);
         return res.status(500).json({ error: 'Failed to destroy session' });
       }
-      console.log('Logout successful');
       res.json({ message: 'Logged out successfully' });
     });
   });
@@ -368,7 +356,7 @@ function ensureAuthenticated(req, res, next) {
   return res.status(401).json({ message: 'Unauthorized' });
 }
 
-// Poll routes
+// Poll Routes
 
 // Create a new poll
 app.post(
@@ -379,16 +367,15 @@ app.post(
     body('description').optional().isString(),
     body('options').isArray({ min: 2 }),
     body('type').isIn(['normal', 'blockchain']),
-    body('blockchainId').optional().isInt(), // Changed from 'id' to 'blockchainId'
+    body('blockchainId').optional().isInt(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { blockchainId, title, description, options, type } = req.body; // Changed 'id' to 'blockchainId'
+    const { blockchainId, title, description, options, type } = req.body;
     const userId = req.user.id;
 
     try {
@@ -423,7 +410,7 @@ app.post(
   }
 );
 
-// Get all polls
+// Retrieve all polls
 app.get('/polls', ensureAuthenticated, async (req, res) => {
   try {
     const pollsResult = await pool.query(
@@ -439,7 +426,7 @@ app.get('/polls', ensureAuthenticated, async (req, res) => {
   }
 });
 
-// Get poll details
+// Retrieve poll details
 app.get('/polls/:pollId', ensureAuthenticated, async (req, res) => {
   const { pollId } = req.params;
 
@@ -498,7 +485,7 @@ app.post(
   }
 );
 
-// Get poll results (votes count)
+// Retrieve poll results with vote counts
 app.get('/polls/:pollId/results', ensureAuthenticated, async (req, res) => {
   const { pollId } = req.params;
 
@@ -523,7 +510,7 @@ app.get('/polls/:pollId/results', ensureAuthenticated, async (req, res) => {
   }
 });
 
-// Check if user has already voted on a poll
+// Check if the user has already voted on a poll
 app.get('/polls/:pollId/hasVoted', ensureAuthenticated, async (req, res) => {
   const { pollId } = req.params;
   const userId = req.user.id;
@@ -547,12 +534,12 @@ app.listen(PORT, () => {
   console.log('Environment:', process.env.NODE_ENV);
 });
 
-// Catch unhandled promise rejections
+// Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-// Catch uncaught exceptions
+// Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception thrown:', err);
 });

@@ -4,19 +4,19 @@ import axios from 'axios';
 import '../../styles/Auth/Auth.css';
 
 const SignUp = ({ setUser }) => {
-  const [firstName, setFirstName] = useState(''); // For 'firstName'
-  const [lastName, setLastName] = useState(''); // For 'lastName'
-  const [email, setEmail] = useState(''); // For 'email'
-  const [password, setPassword] = useState(''); // For 'password'
-  const [confirmPassword, setConfirmPassword] = useState(''); // For 'confirmPassword'
-  const [phoneNumber, setPhoneNumber] = useState(''); // For 'phoneNumber'
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if passwords match
+    // Validate that passwords match
     if (password !== confirmPassword) {
       alert('Passwords do not match.');
       return;
@@ -53,7 +53,6 @@ const SignUp = ({ setUser }) => {
       <div className="auth-form">
         <h2>Sign Up</h2>
         <form onSubmit={handleSubmit}>
-          {/* First Name */}
           <div className="form-group">
             <input
               type="text"
@@ -64,7 +63,6 @@ const SignUp = ({ setUser }) => {
             />
           </div>
 
-          {/* Last Name */}
           <div className="form-group">
             <input
               type="text"
@@ -75,7 +73,6 @@ const SignUp = ({ setUser }) => {
             />
           </div>
 
-          {/* Phone Number */}
           <div className="form-group">
             <input
               type="tel"
@@ -85,7 +82,6 @@ const SignUp = ({ setUser }) => {
             />
           </div>
 
-          {/* Email */}
           <div className="form-group">
             <input
               type="email"
@@ -96,7 +92,6 @@ const SignUp = ({ setUser }) => {
             />
           </div>
 
-          {/* Password */}
           <div className="form-group">
             <input
               type="password"
@@ -107,7 +102,6 @@ const SignUp = ({ setUser }) => {
             />
           </div>
 
-          {/* Confirm Password */}
           <div className="form-group">
             <input
               type="password"
@@ -118,13 +112,11 @@ const SignUp = ({ setUser }) => {
             />
           </div>
 
-          {/* Submit Button */}
           <button type="submit" className="auth-button">
             Register
           </button>
         </form>
 
-        {/* Link to Sign In */}
         <p className="auth-link">
           Already have an account? <Link to="/signin">Sign In</Link>
         </p>

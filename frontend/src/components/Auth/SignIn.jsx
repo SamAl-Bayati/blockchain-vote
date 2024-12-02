@@ -30,7 +30,7 @@ const SignIn = ({ onLogin, setUser }) => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://api-evote.onrender.com/auth/google'; // Update with your backend URL
+    window.location.href = 'https://api-evote.onrender.com/auth/google';
   };
 
   return (
@@ -38,7 +38,6 @@ const SignIn = ({ onLogin, setUser }) => {
       <div className="auth-form">
         <h2>Sign In</h2>
         <form onSubmit={handleSubmit}>
-          {/* Email */}
           <div className="form-group">
             <input
               type="email"
@@ -49,7 +48,6 @@ const SignIn = ({ onLogin, setUser }) => {
             />
           </div>
 
-          {/* Password */}
           <div className="form-group">
             <input
               type="password"
@@ -60,7 +58,6 @@ const SignIn = ({ onLogin, setUser }) => {
             />
           </div>
 
-          {/* Submit Button */}
           <button type="submit" className="auth-button">
             Sign In
           </button>
@@ -68,12 +65,10 @@ const SignIn = ({ onLogin, setUser }) => {
 
         <div className="divider">or</div>
 
-        {/* Google Login Button */}
         <button onClick={handleGoogleLogin} className="google-button">
           Login with Google
         </button>
 
-        {/* Link to Sign Up */}
         <p className="auth-link">
           Don't have an account? <Link to="/signup">Sign Up</Link>
         </p>

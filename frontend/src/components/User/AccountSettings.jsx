@@ -4,10 +4,12 @@ import Header from '../Home/Header';
 import '../../styles/User/AccountSettings.css';
 
 const AccountSettings = ({ user, onLogout }) => {
+  // Initialize state with user details
   const [firstName, setFirstName] = useState(user.firstName || '');
   const [lastName, setLastName] = useState(user.lastName || '');
   const [email, setEmail] = useState(user.email || '');
 
+  // Handle form submission to update account settings
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -32,15 +34,28 @@ const AccountSettings = ({ user, onLogout }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>First Name:</label>
-            <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+            <input
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Last Name:</label>
-            <input value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+            <input
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Email:</label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
           <button type="submit">Update Settings</button>
         </form>

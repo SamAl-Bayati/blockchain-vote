@@ -1,5 +1,3 @@
-// CreatePoll.jsx
-
 import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
 import '../../styles/Polls/CreatePoll.css';
@@ -8,7 +6,7 @@ import { ethers } from 'ethers';
 import axios from 'axios';
 
 const CreatePoll = ({ user, onLogout }) => {
-  const [pollType, setPollType] = useState('normal'); // New state for poll type
+  const [pollType, setPollType] = useState('normal');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [options, setOptions] = useState(['', '']);
@@ -59,7 +57,7 @@ const CreatePoll = ({ user, onLogout }) => {
       }
 
       try {
-        // Request account access first
+        // Request account access
         await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -88,11 +86,11 @@ const CreatePoll = ({ user, onLogout }) => {
           throw new Error('PollCreated event not found in transaction receipt.');
         }
 
-        const newPollId = event.args.id.toNumber(); // Updated to match the event parameter name
+        const newPollId = event.args.id.toNumber();
 
         // Send poll data to the backend for synchronization
         const pollData = {
-          blockchainId: newPollId, // Ensure this matches the backend's expected field
+          blockchainId: newPollId,
           title,
           description,
           options,

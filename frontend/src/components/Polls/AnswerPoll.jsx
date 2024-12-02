@@ -6,10 +6,9 @@ import { ethers } from 'ethers';
 import axios from 'axios';
 
 const AnswerPoll = ({ user, onLogout }) => {
-  const { pollId } = useParams(); // This is the database poll ID
+  const { pollId } = useParams();
   const navigate = useNavigate();
 
-  // Separate states for poll metadata and options
   const [pollMetadata, setPollMetadata] = useState(null);
   const [pollOptions, setPollOptions] = useState([]);
   const [isBlockchainPoll, setIsBlockchainPoll] = useState(false);
@@ -18,27 +17,23 @@ const AnswerPoll = ({ user, onLogout }) => {
   const [hasVoted, setHasVoted] = useState(false);
   const [contractInfo, setContractInfo] = useState(null);
 
-  // New state to store blockchainId
   const [blockchainId, setBlockchainId] = useState(null);
 
   useEffect(() => {
     const fetchPoll = async () => {
       try {
-        // Fetch poll data from the backend
         const response = await axios.get(`/polls/${pollId}`);
         const pollData = response.data.poll;
         const optionsData = response.data.options;
-  
+
         setPollMetadata(pollData);
         setPollOptions(optionsData);
         setIsBlockchainPoll(pollData.type === 'blockchain');
-  
-        // Set the blockchainId if it's a blockchain poll
+
         if (pollData.type === 'blockchain') {
           setBlockchainId(pollData.blockchain_id);
         }
-  
-        // Check if the user has already voted (for normal polls)
+
         if (pollData.type === 'normal') {
           const voteCheck = await axios.get(`/polls/${pollId}/hasVoted`);
           setHasVoted(voteCheck.data.hasVoted);
@@ -47,7 +42,7 @@ const AnswerPoll = ({ user, onLogout }) => {
         console.error('Error fetching poll:', error);
       }
     };
-  
+
     fetchPoll();
   }, [pollId]);
 
@@ -70,17 +65,12 @@ const AnswerPoll = ({ user, onLogout }) => {
         alert('MetaMask is not installed. Please install MetaMask to interact with the blockchain.');
         return;
       }
-      if (!contractInfo) {
-        console.error('Contract info not loaded yet.');
-        return;
-      }
-      if (blockchainId === null) {
-        console.error('Blockchain poll ID is not available.');
+      if (!contractInfo || blockchainId === null) {
+        console.error('Required blockchain information is missing.');
         return;
       }
 
       try {
-        // Request account access first
         await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -92,7 +82,6 @@ const AnswerPoll = ({ user, onLogout }) => {
         }
 
         const signer = provider.getSigner();
-
         const pollContract = new ethers.Contract(
           contractInfo.contractAddress,
           contractInfo.abi,
@@ -115,7 +104,6 @@ const AnswerPoll = ({ user, onLogout }) => {
         }));
         setPollOptions(options);
 
-        // Check if user has already voted
         const hasVoted = await pollContract.voters(blockchainId, await signer.getAddress());
         setHasVoted(hasVoted);
       } catch (error) {
@@ -135,21 +123,12 @@ const AnswerPoll = ({ user, onLogout }) => {
     }
 
     if (isBlockchainPoll) {
-      if (!window.ethereum) {
-        alert('MetaMask is not installed. Please install MetaMask to interact with the blockchain.');
-        return;
-      }
-      if (!contractInfo) {
-        alert('Contract information not loaded yet.');
-        return;
-      }
-      if (blockchainId === null) {
-        alert('Blockchain poll ID is not available.');
+      if (!window.ethereum || !contractInfo || blockchainId === null) {
+        alert('Blockchain information is missing or MetaMask is not installed.');
         return;
       }
 
       try {
-        // Request account access first
         await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -161,7 +140,6 @@ const AnswerPoll = ({ user, onLogout }) => {
         }
 
         const signer = provider.getSigner();
-
         const pollContract = new ethers.Contract(
           contractInfo.contractAddress,
           contractInfo.abi,
@@ -183,7 +161,6 @@ const AnswerPoll = ({ user, onLogout }) => {
         }
       }
     } else {
-      // Handle normal poll voting
       try {
         await axios.post(`/polls/${pollId}/vote`, { optionId: selectedOption });
         alert('Your vote has been recorded.');

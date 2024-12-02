@@ -2,10 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/Home/Header.css';
 
+/**
+ * Header component that displays navigation links and user menu.
+ *
+ * @param {Object} props
+ * @param {Object} props.user - The current user object.
+ * @param {Function} props.onLogout - Function to handle user logout.
+ */
 const Header = ({ user, onLogout }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Close the dropdown menu when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

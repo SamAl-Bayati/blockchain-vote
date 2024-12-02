@@ -1,4 +1,3 @@
-// PollResults.jsx
 
 import React, { useState, useEffect } from 'react';
 import Header from '../Home/Header';
@@ -8,21 +7,17 @@ import { ethers } from 'ethers';
 import axios from 'axios';
 
 const PollResults = ({ user }) => {
-  const { pollId } = useParams(); // This is the database poll ID
+  const { pollId } = useParams();
 
-  // Separate states for poll metadata and options
   const [pollMetadata, setPollMetadata] = useState(null);
   const [pollOptions, setPollOptions] = useState([]);
   const [isBlockchainPoll, setIsBlockchainPoll] = useState(false);
   const [contractInfo, setContractInfo] = useState(null);
-
-  // New state to store blockchainId
   const [blockchainId, setBlockchainId] = useState(null);
 
   useEffect(() => {
     const fetchPollResults = async () => {
       try {
-        // Fetch poll results from the backend
         const response = await axios.get(`/polls/${pollId}/results`);
         const pollData = response.data.poll;
         const optionsData = response.data.options;
@@ -31,7 +26,6 @@ const PollResults = ({ user }) => {
         setPollOptions(optionsData);
         setIsBlockchainPoll(pollData.type === 'blockchain');
 
-        // Set the blockchainId if it's a blockchain poll
         if (pollData.type === 'blockchain') {
           setBlockchainId(pollData.blockchain_id);
         }
@@ -63,7 +57,6 @@ const PollResults = ({ user }) => {
       if (!window.ethereum || !contractInfo || blockchainId === null) return;
 
       try {
-        // Request account access first
         await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -90,14 +83,14 @@ const PollResults = ({ user }) => {
           const option = await pollContract.getOption(blockchainId, i);
           const voteCount = option[1].toNumber();
           totalVotes += voteCount;
-          options.push({ id: i, text: option[0], voteCount: voteCount });
+          options.push({ id: i, text: option[0], voteCount });
         }
 
         setPollMetadata((prev) => ({
           ...prev,
           title: pollData[2],
           description: pollData[3],
-          totalVotes: totalVotes,
+          totalVotes,
         }));
         setPollOptions(options);
       } catch (error) {
