@@ -64,7 +64,6 @@ git clone <https://github.com/SamAlbayati2/blockchain-vote.git>
 **a. Navigate to the Backend Directory**
 
 `
-
 cd backend
 `
 
@@ -73,7 +72,6 @@ cd backend
 Ensure you are in the backend directory and run:
 
 `
-
 npm install
 `
 
@@ -82,38 +80,24 @@ npm install
 Create a .env file in the backend directory based on the provided .env template. You can copy the sample .env and fill in your own values.
 
 `
-
 cp .env.example .env
 `
 
 **.env Example:**
 
 `
-
 GOOGLE_CLIENT_ID=your_google_client_id
-
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-
 REDIS_URL=redis://localhost:6379
-
 NODE_ENV=development
-
 SESSION_SECRET=your_session_secret
-
 DATABASE_URL=postgresql://username:password@localhost:5432/blockchain_vote_db
-
 GOOGLE_CALLBACK_URL=<http://localhost:5000/auth/google/callback>
-
 CLIENT_URL=<http://localhost:3000>
-
 INFURA_PROJECT_ID=your_infura_project_id
-
 DEPLOYER_PRIVATE_KEY=your_deployer_private_key
-
 SEPOLIA_EP=<https://sepolia.infura.io/v3/your_infura_project_id>
-
 CONTRACT_ADDRESS=your_deployed_contract_address
-
 ARTIFACTS_PATH=../artifacts
 `
 
@@ -139,110 +123,75 @@ Ensure PostgreSQL is installed and running. Create the required database and tab
 1. **Create Database:**
 
 `
-
 psql -U postgres
 `
 
 In the psql shell:
 
 `
-
 CREATE DATABASE blockchain_vote_db;
-
 \\c blockchain_vote_db
+`
 
 1. **Create Tables:**
 
 Execute the following SQL commands to create the necessary tables:
 
-sql
-
-Copy code
-
+`
 \-- Users Table
-
 CREATE TABLE users (
-
 id SERIAL PRIMARY KEY,
-
 google_id VARCHAR(255),
-
 first_name VARCHAR(255) NOT NULL,
-
 last_name VARCHAR(255) NOT NULL,
-
 email VARCHAR(255) NOT NULL UNIQUE,
-
 password VARCHAR(255),
-
 phone_number VARCHAR(50),
-
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-
 updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-
 );
+`
 
+`
 \-- Polls Table
-
 CREATE TABLE polls (
-
 id SERIAL PRIMARY KEY,
-
 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-
 title VARCHAR(255) NOT NULL,
-
 description TEXT,
-
 type VARCHAR(20) NOT NULL DEFAULT 'normal',
-
 blockchain_id INTEGER,
-
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-
 updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-
 );
+`
 
+`
 \-- Options Table
-
 CREATE TABLE options (
-
 id SERIAL PRIMARY KEY,
-
 poll_id INTEGER NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
-
 text VARCHAR(255) NOT NULL,
-
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-
 updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-
 );
+`
 
+`
 \-- Votes Table
-
 CREATE TABLE votes (
-
 id SERIAL PRIMARY KEY,
-
 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-
 option_id INTEGER NOT NULL REFERENCES options(id) ON DELETE CASCADE,
-
 poll_id INTEGER NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
-
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-
 updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-
 );
+`
 
+`
 \-- Indexes for performance
-
 CREATE INDEX idx_options_poll_id ON options(poll_id);
-
 CREATE INDEX idx_polls_user_id ON polls(user_id);
 `
 
@@ -252,25 +201,20 @@ Redis is used for session storage in production environments. For local developm
 
 - **Install Redis:**
   - **macOS:**
-
-`
-
-brew install redis
-`
+    `
+    brew install redis
+    `
 
 - - **Ubuntu/Debian:**
 
 `
-
 sudo apt update
-
 sudo apt install redis-server
 `
 
 - **Start Redis Server:**
 
 `
-
 redis-server
 `
 
@@ -279,7 +223,6 @@ redis-server
 Ensure you are in the backend directory and run:
 
 `
-
 npm start
 `
 
@@ -292,7 +235,6 @@ The server should start on <http://localhost:5000>.
 Open a new terminal window/tab and navigate to the frontend directory:
 
 `
-
 cd frontend
 `
 
@@ -301,7 +243,6 @@ cd frontend
 Ensure you are in the frontend directory and run:
 
 `
-
 npm install
 `
 
@@ -310,14 +251,12 @@ npm install
 Create a .env file in the frontend directory based on the provided .env template.
 
 `
-
 cp .env.example .env
 `
 
 **.env Example:**
 
 `
-
 REACT_APP_API_URL=<http://localhost:5000>
 `
 
@@ -330,7 +269,6 @@ REACT_APP_API_URL=<http://localhost:5000>
 Ensure you are in the frontend directory and run:
 
 `
-
 npm start
 `
 
@@ -343,7 +281,6 @@ The frontend should start on <http://localhost:3000> and automatically open in y
 Ensure you are in the backend directory:
 
 `
-
 cd backend
 `
 
@@ -352,7 +289,6 @@ cd backend
 If not already installed, install Hardhat and necessary plugins:
 
 `
-
 npm install --save-dev hardhat @nomiclabs/hardhat-waffle @nomiclabs/hardhat-ethers ethers dotenv
 `
 
@@ -361,33 +297,19 @@ npm install --save-dev hardhat @nomiclabs/hardhat-waffle @nomiclabs/hardhat-ethe
 Ensure the hardhat.config.js file is properly set with your Infura project ID and deployer private key in the .env file.
 
 `
-
 require('@nomiclabs/hardhat-waffle');
-
 require('@nomiclabs/hardhat-ethers');
-
 require('dotenv').config();
-
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
-
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
-
 module.exports = {
-
 solidity: '0.8.0',
-
 networks: {
-
 sepolia: {
-
-url: \`<https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}\`>,
-
-accounts: \[\`${DEPLOYER_PRIVATE_KEY}\`\],
-
+url: \``<https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}\``>,
+accounts: \[\``${DEPLOYER_PRIVATE_KEY}\``\],
 },
-
 },
-
 };
 `
 
@@ -396,15 +318,15 @@ accounts: \[\`${DEPLOYER_PRIVATE_KEY}\`\],
 Run the deployment script using Hardhat:
 
 `
-
 npx hardhat run scripts/deploy.js --network sepolia
 `
+
 **Output:**
 
 `
-
 PollContract deployed to: 0xYourContractAddress
 `
+
 Copy the deployed contract address and update the CONTRACT_ADDRESS in your backend .env file.
 
 **5\. Database Setup**
@@ -422,19 +344,16 @@ After completing the installation steps:
 1. **Start the Backend Server:**
 
 `
-
 cd backend
-
 npm start
 `
+
 1. **Start the Frontend Application:**
 
 Open a new terminal window/tab:
 
 `
-
 cd frontend
-
 npm start
 `
 
@@ -491,7 +410,6 @@ If deploying smart contracts directly from a cloud server:
 3. **Deploy Contracts:**
 
 `
-
 npx hardhat run scripts/deploy.js --network sepolia
 `
 
