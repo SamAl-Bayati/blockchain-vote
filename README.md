@@ -20,7 +20,6 @@
     - [Smart Contract Deployment](#smart-contract-deployment-cloud)
 8. [Usage](#usage)
 9. [Troubleshooting](#troubleshooting)
-10. [License](#license)
 
 ### Features
 
@@ -80,7 +79,7 @@ Ensure you are in the backend directory and run:
 npm install
 `
 
-### c. Configure Environment Variables
+### Environment Variables
 
 Create a .env file in the backend directory based on the provided .env template. You can copy the sample .env and fill in your own values.
 
@@ -135,7 +134,7 @@ ARTIFACTS_PATH=../artifacts
 - CONTRACT_ADDRESS: Address of the deployed PollContract.
 - ARTIFACTS_PATH: Path to smart contract artifacts.
 
-### d. Database Setup
+### Database Setup
 
 Ensure PostgreSQL is installed and running. Create the required database and tables.
 
@@ -288,7 +287,7 @@ npm start
 
 The server should start on <http://localhost:5000>.
 
-**3\. Frontend Setup**
+#### Frontend Setup
 
 **a. Navigate to the Frontend Directory**
 
@@ -339,7 +338,7 @@ npm start
 
 The frontend should start on <http://localhost:3000> and automatically open in your default browser.
 
-### 4\. Smart Contract Deployment
+### Smart Contract Deployment
 
 **a. Navigate to the Backend Directory**
 
@@ -445,11 +444,11 @@ npm start
 
 Open your browser and navigate to <http://localhost:3000>.
 
-### Deployment to Cloud Services**
+### Deployment to Cloud Services
 
 You can deploy the backend and frontend to cloud service providers like [Render](https://render.com/), [Heroku](https://www.heroku.com/), [AWS](https://aws.amazon.com/), etc. Below are general guidelines for deploying to cloud platforms.
 
-### 1\. Backend Deployment**
+#### Backend Deployment
 
 **a. Choose a Cloud Provider**
 
@@ -469,7 +468,7 @@ Render will automatically build and deploy your backend service. Ensure that the
 
 Render provides automatic SSL. Ensure that your frontend is aware of the deployed backend URL.
 
-### 2\. Frontend Deployment**
+#### Frontend Deployment
 
 **a. Choose a Cloud Provider**
 
@@ -485,7 +484,7 @@ For example, using **Render** or **Vercel**:
 
 The platform will build and deploy your frontend application. Ensure that API calls point to the correct backend URL.
 
-### 3\. Smart Contract Deployment on Cloud**
+#### Smart Contract Deployment Cloud
 
 If deploying smart contracts directly from a cloud server:
 
@@ -500,7 +499,7 @@ npx hardhat run scripts/deploy.js --network sepolia
 
 1. **Update Backend .env:** Set CONTRACT_ADDRESS to the deployed contract address.
 
-**Usage**
+### Usage
 
 1. **Access the Application:**
 
@@ -522,7 +521,7 @@ Navigate to your frontend URL (e.g., <http://localhost:3000> or your deployed fr
 5. **Manage Account Settings:**
     - Update your personal information in the "Account Settings" section.
 
-**Troubleshooting**
+### Troubleshooting
 
 - **Backend Server Not Starting:**
   - Ensure all environment variables are correctly set.
@@ -543,6 +542,6 @@ Navigate to your frontend URL (e.g., <http://localhost:3000> or your deployed fr
   - Ensure that the OAuth callback URL is correctly set in both Google Developers Console and the backend .env file.
     
 
-**License**
+### License
 
 This project is licensed under the [MIT License](LICENSE).
