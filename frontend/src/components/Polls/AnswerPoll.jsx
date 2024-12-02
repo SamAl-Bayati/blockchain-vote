@@ -28,16 +28,16 @@ const AnswerPoll = ({ user }) => {
         const response = await axios.get(`/polls/${pollId}`);
         const pollData = response.data.poll;
         const optionsData = response.data.options;
-
+  
         setPollMetadata(pollData);
         setPollOptions(optionsData);
         setIsBlockchainPoll(pollData.type === 'blockchain');
-
+  
         // Set the blockchainId if it's a blockchain poll
         if (pollData.type === 'blockchain') {
           setBlockchainId(pollData.blockchain_id);
         }
-
+  
         // Check if the user has already voted (for normal polls)
         if (pollData.type === 'normal') {
           const voteCheck = await axios.get(`/polls/${pollId}/hasVoted`);
@@ -47,9 +47,10 @@ const AnswerPoll = ({ user }) => {
         console.error('Error fetching poll:', error);
       }
     };
-
+  
     fetchPoll();
   }, [pollId]);
+
 
   useEffect(() => {
     if (isBlockchainPoll) {
