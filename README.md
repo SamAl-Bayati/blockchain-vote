@@ -11,8 +11,6 @@ eVote is a secure, blockchain-based voting application that lets users create an
 - [Running Locally](#running-locally)
 - [Deployment](#deployment)
 - [Usage](#usage)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
 
 ## Features
 - **User Authentication:** Email/password & Google OAuth.
