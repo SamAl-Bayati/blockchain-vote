@@ -46,18 +46,18 @@ cp .env.example .env
 ```
 
 ### 3. Frontend Setup
-`
+```
 cd ../frontend
 npm install
 cp .env.example .env
-`
+```
 
 ### 4. Smart Contract Deployment
-`
+```
 cd ../backend
 npm install --save-dev hardhat @nomiclabs/hardhat-waffle @nomiclabs/hardhat-ethers ethers dotenv
 npx hardhat run scripts/deploy.js --network sepolia
-`
+```
 
 ### 5. Database Setup
 - Create a PostgreSQL database (e.g., blockchain_vote_db) and run the provided SQL scripts to set up the necessary tables.
@@ -69,16 +69,16 @@ npx hardhat run scripts/deploy.js --network sepolia
 
 ### Running Locally
 ### 1. Start Backend
-`
+```
 cd backend
 npm start
-`
+```
 
 ### 2. Start Frontend
-`
+```
 cd frontend
 npm start
-`
+```
 
 ### Deployment
 - Deploy the backend and frontend on your preferred cloud service (e.g., Render, Heroku, AWS). Configure environment variables via the platform’s dashboard and update API URLs accordingly.
@@ -88,3 +88,9 @@ npm start
 - Create Poll: Choose a normal or blockchain poll.
 - Vote & View Results: Participate in polls and see live results.
 - Manage Account: Update personal settings securely.
+
+### Troubleshooting
+- Server Issues: Verify that environment variables are correct and required services (PostgreSQL, Redis) are running.
+- Database Errors: Check your DATABASE_URL and ensure the database is accessible.
+- Deployment Problems: Confirm Hardhat configurations and credentials for smart contract deployment.
+
