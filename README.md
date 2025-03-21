@@ -39,11 +39,11 @@ eVote is a secure, blockchain-based voting application that lets users create an
 git clone https://github.com/SamAlbayati2/blockchain-vote.git
 `
 ### 2. Backend Setup
-`
+```
 cd backend
 npm install
 cp .env.example .env
-`
+```
 
 ### 3. Frontend Setup
 `
